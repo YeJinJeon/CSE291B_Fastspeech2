@@ -1,10 +1,10 @@
-dataset: "ESD"
+dataset: "ESD_Result"
 
 path:
-  corpus_path: "C:/Users/samsung/UCSD/Fall22/CSE291B/ESD"
+  corpus_path: "C:/Users/samsung/UCSD/Fall22/CSE291B/FastSpeech2_ESD_Results/ESD"
   lexicon_path: "lexicon/librispeech-lexicon.txt"
-  raw_path: "./raw_data/ESD"
-  preprocessed_path: "./preprocessed_data/ESD2"
+  raw_path: "./raw_data/ESD_Results"
+  preprocessed_path: "./preprocessed_data/ESD_results"
 
 preprocessing:
   val_size: 512

@@ -1,10 +1,10 @@
 dataset: "ESD"
 
 path:
-  corpus_path: "C:/Users/samsung/UCSD/Fall22/CSE291B/ESD"
+  corpus_path: "C:/Users/samsung/UCSD/Fall22/CSE291B/IEMOCAP"
   lexicon_path: "lexicon/librispeech-lexicon.txt"
-  raw_path: "./raw_data/ESD"
-  preprocessed_path: "./preprocessed_data/ESD2"
+  raw_path: "./raw_data/IEMOCAP"
+  preprocessed_path: "./preprocessed_data/IEMOCAP"
 
 preprocessing:
   val_size: 512
