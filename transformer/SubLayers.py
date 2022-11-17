@@ -60,7 +60,7 @@ class MultiHeadAttention(nn.Module):
             return output, attn
         else: #style encoder
             output = self.dropout(self.fc(output))
-            return output 
+            return output, attn 
 
 
 class PositionwiseFeedForward(nn.Module):

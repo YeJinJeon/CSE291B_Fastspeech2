@@ -15,6 +15,7 @@ class FastSpeech2Loss(nn.Module):
         ]
         self.mse_loss = nn.MSELoss()
         self.mae_loss = nn.L1Loss()
+        self.ce_loss = nn.CrossEntropyLoss()
 
     def forward(self, inputs, predictions):
         (
@@ -24,7 +25,10 @@ class FastSpeech2Loss(nn.Module):
             pitch_targets,
             energy_targets,
             duration_targets,
-        ) = inputs[6:]
+        ) = inputs[7:]
+
+        emo_targets = inputs[3]
+
         (
             mel_predictions,
             postnet_mel_predictions,
@@ -36,7 +40,9 @@ class FastSpeech2Loss(nn.Module):
             mel_masks,
             _,
             _,
+            emo_predictions,
         ) = predictions
+       
         src_masks = ~src_masks
         mel_masks = ~mel_masks
         log_duration_targets = torch.log(duration_targets.float() + 1)
@@ -78,8 +84,10 @@ class FastSpeech2Loss(nn.Module):
         energy_loss = self.mse_loss(energy_predictions, energy_targets)
         duration_loss = self.mse_loss(log_duration_predictions, log_duration_targets)
 
+        emotion_loss = self.ce_loss(emo_predictions, emo_targets)
+
         total_loss = (
-            mel_loss + postnet_mel_loss + duration_loss + pitch_loss + energy_loss
+            mel_loss + postnet_mel_loss + duration_loss + pitch_loss + energy_loss + emotion_loss
         )
 
         return (
@@ -89,4 +97,5 @@ class FastSpeech2Loss(nn.Module):
             pitch_loss,
             energy_loss,
             duration_loss,
+            emotion_loss
         )

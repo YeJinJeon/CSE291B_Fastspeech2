@@ -61,6 +61,7 @@ class FastSpeech2(nn.Module):
     def forward(
         self,
         speakers,
+        emotions,
         texts,
         src_lens,
         max_src_len,
@@ -85,7 +86,7 @@ class FastSpeech2(nn.Module):
 
         # integrate with GST
         if self.gst_cfg['use_gst']:
-            style_embs = self.gst(mels)
+            style_embs, style_weights = self.gst(mels)
             output = output + style_embs.unsqueeze(1)
 
         if self.speaker_emb is not None:
@@ -130,4 +131,5 @@ class FastSpeech2(nn.Module):
             mel_masks,
             src_lens,
             mel_lens,
+            style_weights,
         )

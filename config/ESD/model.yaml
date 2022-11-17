@@ -22,8 +22,8 @@ variance_embedding:
 
 gst:
   use_gst: True
-  gst_tokens: 10
-  gst_heads: 2
+  gst_tokens: 5
+  gst_heads: 1
   gst_conv_layers: 6
   gst_conv_chans_list: [32, 32, 64, 64, 128, 128]
   gst_conv_kernel_size: 3

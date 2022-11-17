@@ -16,11 +16,12 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def to_device(data, device):
-    if len(data) == 12:
+    if len(data) == 13:
         (
             ids,
             raw_texts,
             speakers,
+            emotions,
             texts,
             src_lens,
             max_src_len,
@@ -33,6 +34,7 @@ def to_device(data, device):
         ) = data
 
         speakers = torch.from_numpy(speakers).long().to(device)
+        emotions = torch.from_numpy(emotions).long().to(device)
         texts = torch.from_numpy(texts).long().to(device)
         src_lens = torch.from_numpy(src_lens).to(device)
         mels = torch.from_numpy(mels).float().to(device)
@@ -45,6 +47,7 @@ def to_device(data, device):
             ids,
             raw_texts,
             speakers,
+            emotions,
             texts,
             src_lens,
             max_src_len,

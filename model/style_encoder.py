@@ -224,9 +224,9 @@ class StyleTokenLayer(torch.nn.Module):
         gst_embs = torch.tanh(self.gst_embs).unsqueeze(0).expand(batch_size, -1, -1)
         # NOTE(kan-bayashi): Shoule we apply Tanh?
         ref_embs = ref_embs.unsqueeze(1)  # (batch_size, 1 ,ref_embed_dim)
-        style_embs = self.mha(ref_embs, gst_embs, gst_embs, None)
+        style_embs, style_attn = self.mha(ref_embs, gst_embs, gst_embs, None)
 
-        return style_embs.squeeze(1)
+        return style_embs.squeeze(1), style_attn.squeeze(1)
 
 class MultiHeadAttention(BaseMultiHeadedAttention):
     """Multi head attention module with different input dimension."""
