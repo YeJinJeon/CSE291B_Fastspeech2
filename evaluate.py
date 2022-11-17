@@ -54,34 +54,34 @@ def evaluate(model, step, configs, logger=None, vocoder=None):
         *([step] + [l for l in loss_means])
     )
 
-    if logger is not None:
-        fig, wav_reconstruction, wav_prediction, tag = synth_one_sample(
-            batch,
-            output,
-            vocoder,
-            model_config,
-            preprocess_config,
-        )
+    # if logger is not None:
+    #     fig, wav_reconstruction, wav_prediction, tag = synth_one_sample(
+    #         batch,
+    #         output,
+    #         vocoder,
+    #         model_config,
+    #         preprocess_config,
+    #     )
 
-        log(logger, step, losses=loss_means)
-        log(
-            logger,
-            fig=fig,
-            tag="Validation/step_{}_{}".format(step, tag),
-        )
-        sampling_rate = preprocess_config["preprocessing"]["audio"]["sampling_rate"]
-        log(
-            logger,
-            audio=wav_reconstruction,
-            sampling_rate=sampling_rate,
-            tag="Validation/step_{}_{}_reconstructed".format(step, tag),
-        )
-        log(
-            logger,
-            audio=wav_prediction,
-            sampling_rate=sampling_rate,
-            tag="Validation/step_{}_{}_synthesized".format(step, tag),
-        )
+    #     log(logger, step, losses=loss_means)
+    #     log(
+    #         logger,
+    #         fig=fig,
+    #         tag="Validation/step_{}_{}".format(step, tag),
+    #     )
+    #     sampling_rate = preprocess_config["preprocessing"]["audio"]["sampling_rate"]
+    #     log(
+    #         logger,
+    #         audio=wav_reconstruction,
+    #         sampling_rate=sampling_rate,
+    #         tag="Validation/step_{}_{}_reconstructed".format(step, tag),
+    #     )
+    #     log(
+    #         logger,
+    #         audio=wav_prediction,
+    #         sampling_rate=sampling_rate,
+    #         tag="Validation/step_{}_{}_synthesized".format(step, tag),
+    #     )
 
     return message
 
