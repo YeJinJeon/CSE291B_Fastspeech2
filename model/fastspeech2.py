@@ -7,6 +7,7 @@ import torch.nn.functional as F
 
 from transformer import Encoder, Decoder, PostNet
 from .modules import VarianceAdaptor
+from .style_encoder import StyleEncoder
 from utils.tools import get_mask_from_lengths
 
 
@@ -20,6 +21,23 @@ class FastSpeech2(nn.Module):
         self.encoder = Encoder(model_config)
         self.variance_adaptor = VarianceAdaptor(preprocess_config, model_config)
         self.decoder = Decoder(model_config)
+
+        # define GST
+        self.gst_cfg = self.model_config['gst']
+        if self.gst_cfg['use_gst']:
+            self.gst = StyleEncoder(
+                # idim=odim,  # the input is mel-spectrogram
+                gst_tokens=self.gst_cfg['gst_tokens'],
+                gst_token_dim=self.gst_cfg['adim'],
+                gst_heads=self.gst_cfg['gst_heads'],
+                conv_layers=self.gst_cfg['gst_conv_layers'],
+                conv_chans_list=self.gst_cfg['gst_conv_chans_list'],
+                conv_kernel_size=self.gst_cfg['gst_conv_kernel_size'],
+                conv_stride=self.gst_cfg['gst_conv_stride'],
+                gru_layers=self.gst_cfg['gst_gru_layers'],
+                gru_units=self.gst_cfg['gst_gru_units'],
+            )
+
         self.mel_linear = nn.Linear(
             model_config["transformer"]["decoder_hidden"],
             preprocess_config["preprocessing"]["mel"]["n_mel_channels"],
@@ -64,6 +82,11 @@ class FastSpeech2(nn.Module):
         )
 
         output = self.encoder(texts, src_masks)
+
+        # integrate with GST
+        if self.gst_cfg['use_gst']:
+            style_embs = self.gst(mels)
+            output = output + style_embs.unsqueeze(1)
 
         if self.speaker_emb is not None:
             output = output + self.speaker_emb(speakers).unsqueeze(1).expand(
