@@ -55,6 +55,7 @@ def get_vocoder(config, device):
         vocoder.mel2wav.eval()
         vocoder.mel2wav.to(device)
     elif name == "HiFi-GAN":
+        print("Change Hifi GAN PATH")
         with open("/home/yejeon/CSE291B_Fastspeech2/hifigan/config.json", "r") as f:
             config = json.load(f)
         config = hifigan.AttrDict(config)
