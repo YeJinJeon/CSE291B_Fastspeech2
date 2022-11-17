@@ -99,7 +99,7 @@ def main(args, configs):
                 if step % log_step == 0:
                     losses = [l.item() for l in losses]
                     message1 = "Step {}/{}, ".format(step, total_step)
-                    message2 = "Total Loss: {:.4f}, Mel Loss: {:.4f}, Mel PostNet Loss: {:.4f}, Pitch Loss: {:.4f}, Energy Loss: {:.4f}, Duration Loss: {:.4f}".format(
+                    message2 = "Total Loss: {:.4f}, Mel Loss: {:.4f}, Mel PostNet Loss: {:.4f}, Pitch Loss: {:.4f}, Energy Loss: {:.4f}, Duration Loss: {:.4f}, Emotion Loss: {:.4f}".format(
                         *losses
                     )
 
@@ -110,34 +110,34 @@ def main(args, configs):
 
                     log(train_logger, step, losses=losses)
 
-                if step % synth_step == 0:
-                    fig, wav_reconstruction, wav_prediction, tag = synth_one_sample(
-                        batch,
-                        output,
-                        vocoder,
-                        model_config,
-                        preprocess_config,
-                    )
-                    log(
-                        train_logger,
-                        fig=fig,
-                        tag="Training/step_{}_{}".format(step, tag),
-                    )
-                    sampling_rate = preprocess_config["preprocessing"]["audio"][
-                        "sampling_rate"
-                    ]
-                    log(
-                        train_logger,
-                        audio=wav_reconstruction,
-                        sampling_rate=sampling_rate,
-                        tag="Training/step_{}_{}_reconstructed".format(step, tag),
-                    )
-                    log(
-                        train_logger,
-                        audio=wav_prediction,
-                        sampling_rate=sampling_rate,
-                        tag="Training/step_{}_{}_synthesized".format(step, tag),
-                    )
+                # if step % synth_step == 0:
+                #     fig, wav_reconstruction, wav_prediction, tag = synth_one_sample(
+                #         batch,
+                #         output,
+                #         vocoder,
+                #         model_config,
+                #         preprocess_config,
+                #     )
+                #     log(
+                #         train_logger,
+                #         fig=fig,
+                #         tag="Training/step_{}_{}".format(step, tag),
+                #     )
+                #     sampling_rate = preprocess_config["preprocessing"]["audio"][
+                #         "sampling_rate"
+                #     ]
+                #     log(
+                #         train_logger,
+                #         audio=wav_reconstruction,
+                #         sampling_rate=sampling_rate,
+                #         tag="Training/step_{}_{}_reconstructed".format(step, tag),
+                #     )
+                #     log(
+                #         train_logger,
+                #         audio=wav_prediction,
+                #         sampling_rate=sampling_rate,
+                #         tag="Training/step_{}_{}_synthesized".format(step, tag),
+                #     )
 
                 if step % val_step == 0:
                     model.eval()
