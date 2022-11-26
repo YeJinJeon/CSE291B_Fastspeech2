@@ -169,7 +169,7 @@ class Dataset(Dataset):
 
 
 class TextDataset(Dataset):
-    def __init__(self, filepath, preprocess_config):
+    def __init__(self, filepath, preprocess_config, emotion):
         self.cleaners = preprocess_config["preprocessing"]["text"]["text_cleaners"]
 
         self.basename, self.speaker, self.text, self.raw_text = self.process_meta(
@@ -181,6 +181,7 @@ class TextDataset(Dataset):
             )
         ) as f:
             self.speaker_map = json.load(f)
+        self.emotion = [emotion for _ in range(len(self.basename))]
 
     def __len__(self):
         return len(self.text)
@@ -189,10 +190,11 @@ class TextDataset(Dataset):
         basename = self.basename[idx]
         speaker = self.speaker[idx]
         speaker_id = self.speaker_map[speaker]
+        emotion_id = self.emotion[idx]
         raw_text = self.raw_text[idx]
         phone = np.array(text_to_sequence(self.text[idx], self.cleaners))
 
-        return (basename, speaker_id, phone, raw_text)
+        return (basename, speaker_id, emotion_id, phone, raw_text)
 
     def process_meta(self, filename):
         with open(filename, "r", encoding="utf-8") as f:
@@ -211,13 +213,14 @@ class TextDataset(Dataset):
     def collate_fn(self, data):
         ids = [d[0] for d in data]
         speakers = np.array([d[1] for d in data])
-        texts = [d[2] for d in data]
-        raw_texts = [d[3] for d in data]
+        emotions = np.array([d[2] for d in data])
+        texts = [d[3] for d in data]
+        raw_texts = [d[4] for d in data]
         text_lens = np.array([text.shape[0] for text in texts])
 
         texts = pad_1D(texts)
 
-        return ids, raw_texts, speakers, texts, text_lens, max(text_lens)
+        return ids, raw_texts, speakers, emotions, texts, text_lens, max(text_lens)
 
 
 if __name__ == "__main__":

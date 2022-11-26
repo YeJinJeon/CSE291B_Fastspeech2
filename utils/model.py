@@ -6,7 +6,8 @@ import numpy as np
 
 import hifigan
 from model import FastSpeech2, ScheduledOptim
-
+import sys
+sys.path.append('..')
 
 def get_model(args, configs, device, train=False):
     (preprocess_config, model_config, train_config) = configs
@@ -17,7 +18,10 @@ def get_model(args, configs, device, train=False):
             train_config["path"]["ckpt_path"],
             "{}.pth.tar".format(args.restore_step),
         )
-        ckpt = torch.load(ckpt_path)
+        if torch.cuda.is_available():
+            ckpt = torch.load(ckpt_path)
+        else:
+            ckpt = torch.load(ckpt_path, map_location=torch.device('cpu'))
         model.load_state_dict(ckpt["model"])
 
     if train:
@@ -56,14 +60,14 @@ def get_vocoder(config, device):
         vocoder.mel2wav.to(device)
     elif name == "HiFi-GAN":
         print("Change Hifi GAN PATH")
-        with open("/home/yejeon/CSE291B_Fastspeech2/hifigan/config.json", "r") as f:
+        with open("hifigan/config.json", "r") as f:
             config = json.load(f)
         config = hifigan.AttrDict(config)
         vocoder = hifigan.Generator(config)
         if speaker == "LJSpeech":
-            ckpt = torch.load("/home/yejeon/CSE291B_Fastspeech2/hifigan/generator_LJSpeech.pth.tar")
+            ckpt = torch.load("hifigan/generator_LJSpeech.pth.tar")
         elif speaker == "universal":
-            ckpt = torch.load("/home/yejeon/CSE291B_Fastspeech2/hifigan/generator_universal.pth.tar", map_location=torch.device('cpu'))
+            ckpt = torch.load("hifigan/generator_universal.pth.tar", map_location=torch.device('cpu'))
         vocoder.load_state_dict(ckpt["generator"])
         vocoder.eval()
         vocoder.remove_weight_norm()

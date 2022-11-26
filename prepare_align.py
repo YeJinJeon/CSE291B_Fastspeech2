@@ -2,7 +2,7 @@ import argparse
 
 import yaml
 
-from preprocessor import ljspeech, aishell3, libritts, esd, esd_result
+from preprocessor import ljspeech, aishell3, libritts, esd, esd_result, test_result
 
 
 def main(config):
@@ -16,6 +16,8 @@ def main(config):
         esd.prepare_align(config)
     if "ESD_Result" == config["dataset"]:
         esd_result.prepare_align(config)
+    if "TEST_Result" == config["dataset"]:
+        test_result.prepare_align(config)
     if "IEMOCAP" in config["dataset"]:
         esd.prepare_align(config)
 

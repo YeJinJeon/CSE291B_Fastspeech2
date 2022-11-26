@@ -111,64 +111,93 @@ def synthesize(model, step, configs, vocoder, batchs, control_values):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--restore_step", type=int, required=True)
-    parser.add_argument(
-        "--mode",
-        type=str,
-        choices=["batch", "single"],
-        required=True,
-        help="Synthesize a whole dataset or a single sentence",
-    )
-    parser.add_argument(
-        "--source",
-        type=str,
-        default=None,
-        help="path to a source file with format like train.txt and val.txt, for batch mode only",
-    )
-    parser.add_argument(
-        "--text",
-        type=str,
-        default=None,
-        help="raw text to synthesize, for single-sentence mode only",
-    )
-    parser.add_argument(
-        "--speaker_id",
-        type=int,
-        default=0,
-        help="speaker ID for multi-speaker synthesis, for single-sentence mode only",
-    )
-    parser.add_argument(
-        "-p",
-        "--preprocess_config",
-        type=str,
-        required=True,
-        help="path to preprocess.yaml",
-    )
-    parser.add_argument(
-        "-m", "--model_config", type=str, required=True, help="path to model.yaml"
-    )
-    parser.add_argument(
-        "-t", "--train_config", type=str, required=True, help="path to train.yaml"
-    )
-    parser.add_argument(
-        "--pitch_control",
-        type=float,
-        default=1.0,
-        help="control the pitch of the whole utterance, larger value for higher pitch",
-    )
-    parser.add_argument(
-        "--energy_control",
-        type=float,
-        default=1.0,
-        help="control the energy of the whole utterance, larger value for larger volume",
-    )
-    parser.add_argument(
-        "--duration_control",
-        type=float,
-        default=1.0,
-        help="control the speed of the whole utterance, larger value for slower speaking rate",
-    )
+    # parser.add_argument("--restore_step", type=int, required=True)
+    # parser.add_argument(
+    #     "--mode",
+    #     type=str,
+    #     choices=["batch", "single"],
+    #     default="batch",
+    #     required=True,
+    #     help="Synthesize a whole dataset or a single sentence",
+    # )
+    # parser.add_argument(
+    #     "--source",
+    #     type=str,
+    #     default=None,
+    #     help="path to a source file with format like train.txt and val.txt, for batch mode only",
+    # )
+    # parser.add_argument(
+    #     "--text",
+    #     type=str,
+    #     default=None,
+    #     help="raw text to synthesize, for single-sentence mode only",
+    # )
+    # parser.add_argument(
+    #     "--speaker_id",
+    #     type=int,
+    #     default=2,
+    #     help="speaker ID for multi-speaker synthesis, for single-sentence mode only",
+    # )
+    # parser.add_argument(
+    #     "--emotion_id",
+    #     type=int,
+    #     default=0,
+    #     help="emotion ID for specific emotional speech",
+    # )
+    # parser.add_argument(
+    #     "-p",
+    #     "--preprocess_config",
+    #     type=str,
+    #     required=True,
+    #     default="./config/ESD/preprocess.yaml",
+    #     help="path to preprocess.yaml",
+    # )
+    # parser.add_argument(
+    #     "-m", "--model_config", type=str, required=True, 
+    #     default="./config/ESD/model.yaml",
+    #     help="path to model.yaml"
+    # )
+    # parser.add_argument(
+    #     "-t", "--train_config", type=str, required=True, 
+    #     default="./config/ESD/train.yaml",
+    #     help="path to train.yaml"
+    # )
+    # parser.add_argument(
+    #     "--pitch_control",
+    #     type=float,
+    #     default=1.0,
+    #     help="control the pitch of the whole utterance, larger value for higher pitch",
+    # )
+    # parser.add_argument(
+    #     "--energy_control",
+    #     type=float,
+    #     default=1.0,
+    #     help="control the energy of the whole utterance, larger value for larger volume",
+    # )
+    # parser.add_argument(
+    #     "--duration_control",
+    #     type=float,
+    #     default=1.0,
+    #     help="control the speed of the whole utterance, larger value for slower speaking rate",
+    # )
     args = parser.parse_args()
+
+    args.restore_step = 20000
+    # args.mode = "batch"
+    # args.source = "./preprocessed_data/ESD/val.txt"
+    # args.text = None
+    args.mode = "single"
+    args.text = "./quant_sentences.txt"
+    args.source = None
+    args.speaker_id = 2 # 0019
+    args.emotion_id = 0
+    args.preprocess_config = "./config/ESD/preprocess.yaml"
+    args.train_config = "./config/ESD/train.yaml"
+    args.model_config = "./config/ESD/model.yaml"
+    args.pitch_control = 1.0
+    args.energy_control = 1.0
+    args.duration_control = 1.0
+    #args.emotion_id = "0"
 
     # Check source texts
     if args.mode == "batch":
@@ -193,7 +222,7 @@ if __name__ == "__main__":
     # Preprocess texts
     if args.mode == "batch":
         # Get dataset
-        dataset = TextDataset(args.source, preprocess_config)
+        dataset = TextDataset(args.source, preprocess_config, args.emotion_id)
         batchs = DataLoader(
             dataset,
             batch_size=8,
@@ -202,6 +231,7 @@ if __name__ == "__main__":
     if args.mode == "single":
         ids = raw_texts = [args.text[:100]]
         speakers = np.array([args.speaker_id])
+        emotions = np.array([args.emotion_id])
         if preprocess_config["preprocessing"]["text"]["language"] == "en":
             texts = np.array([preprocess_english(args.text, preprocess_config)])
         elif preprocess_config["preprocessing"]["text"]["language"] == "zh":

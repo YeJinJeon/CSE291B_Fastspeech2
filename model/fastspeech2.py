@@ -86,8 +86,12 @@ class FastSpeech2(nn.Module):
 
         # integrate with GST
         if self.gst_cfg['use_gst']:
-            style_embs, style_weights = self.gst(mels)
-            output = output + style_embs.unsqueeze(1)
+            if self.gst_cfg['gst_mode']=="train":
+                style_embs, style_weights = self.gst(mels)
+                output = output + style_embs.unsqueeze(1)
+            else:
+                emotion_token = self.gst.stl.gst_embs[emotions[0]]
+                output = output + emotion_token.unsqueeze(0).unsqueeze(0)
 
         if self.speaker_emb is not None:
             output = output + self.speaker_emb(speakers).unsqueeze(1).expand(

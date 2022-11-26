@@ -22,6 +22,7 @@ variance_embedding:
 
 gst:
   use_gst: True
+  gst_mode: "train"
   gst_tokens: 5
   gst_heads: 1
   gst_conv_layers: 6

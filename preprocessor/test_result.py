@@ -19,23 +19,33 @@ def prepare_align(config):
 
     emotions = ["Angry", "Happy", "Neutral", "Sad", "Surprise"]
     for data in os.listdir(in_dir):
-        print(data)
         if "png" in data:
             continue
-        text = data.split(".")[0]
+        text_split = data.split(".")
+        text = ''
+        if len(text_split) > 2:
+            for t in text_split[:-1]:
+                text += t 
+        else:
+            text += text_split[0]  
+        sav_name = text
+        if '_0019' in text:
+            ind = text.find('_0019')
+            text = text[:ind] 
+        print(text) 
         wav_file_path = os.path.join(in_dir,data)
-        if os.path.exists(wav_file_path):
+        if  os.path.exists(wav_file_path):
             print("here")
             os.makedirs(os.path.join(out_dir), exist_ok=True)
             wav, _ = librosa.load(wav_file_path, sampling_rate)
             wav = wav / max(abs(wav)) * max_wav_value
             wavfile.write(
-                os.path.join(out_dir, text+".wav"),
+                os.path.join(out_dir, sav_name+".wav"),
                 sampling_rate,
                 wav.astype(np.int16),
             )
             with open(
-                os.path.join(out_dir, "{}.lab".format(text)),
+                os.path.join(out_dir, "{}.lab".format(sav_name)),
                 "w",
             ) as f1:
                 f1.write(text)
